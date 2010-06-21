@@ -107,21 +107,34 @@ __END__
 
 =head1 NAME
 
-Devel::KYTProf -
+Devel::KYTProf - Simple profiler
 
 =head1 SYNOPSIS
 
   use Devel::KYTProf;
 
+  # your code ( including DBI, LWP )
+
+Output as follows.
+
+  315.837 ms [DBI::st] select * from table where name = ? (1 rows) | main:23
+  1464.204 ms [LWP::UserAgent] GET http://www.hatena.ne.jp/ | main:25
+
 =head1 DESCRIPTION
 
-Devel::KYTProf is
+Devel::KYTProf is a perl code profiler to explore IO blocking time.
 
 =head1 AUTHOR
 
 Yasuhiro Onishi E<lt>yasuhiro.onishi@gmail.comE<gt>
 
 =head1 SEE ALSO
+
+=over
+
+=item L<DBI>
+
+=item L<LWP::UserAgent>
 
 =head1 LICENSE
 
