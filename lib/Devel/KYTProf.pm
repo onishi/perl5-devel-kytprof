@@ -1,7 +1,6 @@
 package Devel::KYTProf;
 use strict;
 use warnings;
-no warnings 'redefine';
 
 use base qw/Class::Data::Inheritable/;
 
@@ -13,6 +12,7 @@ __PACKAGE__->mk_classdata( st_sql => {} );
 use UNIVERSAL::require;
 use DBI;
 use Time::HiRes;
+use Class::Inspector;
 
 { # DBI
     my $orig_prepare        = \&DBI::db::prepare;
@@ -48,11 +48,44 @@ use Time::HiRes;
     );
 };
 
+{ # Cache::Memcached::Fast
+    __PACKAGE__->add_profs(
+        'Cache::Memcached::Fast',
+        [qw{
+            add     add_multi
+            append  append_multi
+            cas     cas_multi
+            decr    decr_multi
+            delete  delete_multi
+            get     get_multi
+            gets    gets_multi
+            incr    incr_multi
+            prepend prepend_multi
+            remove
+            replace replace_multi
+            set     set_multi
+        }],
+    );
+};
+
 sub base_classes_regex {
     my $class = shift;
     return defined $class->_base_classes_regex
         ? $class->_base_classes_regex
         : $class->_base_classes_regex(join '|', map { quotemeta } @{$class->base_classes} || '');
+}
+
+sub add_profs {
+    my ($class, $module, $methods, $callback) = @_;
+    $module->require; # or warn $@ and return;
+    if ($methods eq ':all') {
+        $methods = [];
+        @$methods = @{Class::Inspector->methods($module, 'public')};
+        warn join ',', @$methods;
+    }
+    for my $method (@$methods) {
+        $class->add_prof($module, $method, $callback);
+    }
 }
 
 sub add_prof {
@@ -98,6 +131,7 @@ sub add_prof {
         return wantarray ? @res : $res;
     };
     no strict 'refs';
+    no warnings qw/redefine prototype/;
     *{"$module\::$method"} = $code;
 }
 
@@ -114,6 +148,12 @@ Devel::KYTProf - Simple profiler
   use Devel::KYTProf;
 
   # your code ( including DBI, LWP )
+
+  Devel::KYTProf->add_prof($module, $method, $callback);
+
+  Devel::KYTProf->add_profs($module, $methods, $callback);
+
+  Devel::KYTProf->add_profs($module, $methods, ':all');
 
 Output as follows.
 
