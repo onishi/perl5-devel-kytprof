@@ -7,14 +7,14 @@ use base qw/Class::Data::Inheritable/;
 __PACKAGE__->mk_classdata( base_classes => [qw//] );
 __PACKAGE__->mk_classdata( _base_classes_regex => undef );
 __PACKAGE__->mk_classdata( logger => '' );
-__PACKAGE__->mk_classdata( st_sql => {} );
+__PACKAGE__->mk_classdata( st_sql => {} ); # for DBI
 
 use UNIVERSAL::require;
-use DBI;
 use Time::HiRes;
 use Class::Inspector;
 
-{ # DBI
+'DBI'->require and do {
+    no warnings 'redefine';
     my $orig_prepare        = \&DBI::db::prepare;
     my $orig_prepare_cached = \&DBI::db::prepare_cached;
     *DBI::db::prepare = sub {
@@ -37,7 +37,7 @@ use Class::Inspector;
     );
 };
 
-{ # LWP::UserAgent
+'LWP::UserAgent'->require and do {
     __PACKAGE__->add_prof(
         'LWP::UserAgent',
         'request',
@@ -48,7 +48,7 @@ use Class::Inspector;
     );
 };
 
-{ # Cache::Memcached::Fast
+'Cache::Memcached::Fast'->require and do {
     __PACKAGE__->add_profs(
         'Cache::Memcached::Fast',
         [qw{
@@ -64,6 +64,22 @@ use Class::Inspector;
             remove
             replace replace_multi
             set     set_multi
+        }],
+    );
+};
+
+'MogileFS::Client'->require and do {
+    __PACKAGE__->add_profs(
+        'MogileFS::Client',
+        [qw{
+            edit_file
+            read_file
+            store_file
+            store_content
+            get_paths
+            get_file_data
+            delete
+            rename
         }],
     );
 };
