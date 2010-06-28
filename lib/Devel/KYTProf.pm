@@ -149,20 +149,26 @@ Devel::KYTProf - Simple profiler
 
   # your code ( including DBI, LWP )
 
-  Devel::KYTProf->add_prof($module, $method, $callback);
+=head1 DESCRIPTION
 
-  Devel::KYTProf->add_profs($module, $methods, $callback);
+Devel::KYTProf is a perl code profiler to explore IO blocking time.
 
-  Devel::KYTProf->add_profs($module, $methods, ':all');
+  use Devel::KYTProf;
+
+  # your code ( including DBI, LWP )
 
 Output as follows.
 
   315.837 ms [DBI::st] select * from table where name = ? (1 rows) | main:23
   1464.204 ms [LWP::UserAgent] GET http://www.hatena.ne.jp/ | main:25
 
-=head1 DESCRIPTION
+You can add profiler for any method.
 
-Devel::KYTProf is a perl code profiler to explore IO blocking time.
+  Devel::KYTProf->add_prof($module, $method, $callback);
+
+  Devel::KYTProf->add_profs($module, $methods, $callback);
+
+  Devel::KYTProf->add_profs($module, $methods, ':all');
 
 =head1 AUTHOR
 
