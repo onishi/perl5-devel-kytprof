@@ -11,7 +11,6 @@ __PACKAGE__->mk_classdata( st_sql => {} ); # for DBI
 
 use UNIVERSAL::require;
 use Time::HiRes;
-use Class::Inspector;
 
 'DBI'->require and do {
     no warnings 'redefine';
@@ -95,9 +94,9 @@ sub add_profs {
     my ($class, $module, $methods, $callback) = @_;
     $module->require; # or warn $@ and return;
     if ($methods eq ':all') {
+        Class::Inspector->require or return;
         $methods = [];
         @$methods = @{Class::Inspector->methods($module, 'public')};
-        warn join ',', @$methods;
     }
     for my $method (@$methods) {
         $class->add_prof($module, $method, $callback);
@@ -178,13 +177,16 @@ Output as follows.
   315.837 ms [DBI::st] select * from table where name = ? (1 rows) | main:23
   1464.204 ms [LWP::UserAgent] GET http://www.hatena.ne.jp/ | main:25
 
-You can add profiler for any method.
+You can add profiler to any method.
 
+  Devel::KYTProf->add_prof($module, $method);
   Devel::KYTProf->add_prof($module, $method, $callback);
 
+  Devel::KYTProf->add_profs($module, $methods);
   Devel::KYTProf->add_profs($module, $methods, $callback);
 
-  Devel::KYTProf->add_profs($module, $methods, ':all');
+  Devel::KYTProf->add_profs($module, ':all');
+  Devel::KYTProf->add_profs($module, ':all', $callback);
 
 =head1 AUTHOR
 
