@@ -4,8 +4,9 @@ use warnings;
 
 use base qw/Class::Data::Inheritable/;
 
-__PACKAGE__->mk_classdata( base_classes => [qw//] );
-__PACKAGE__->mk_classdata( _base_classes_regex => undef );
+__PACKAGE__->mk_classdata( namespace_regex       => undef );
+__PACKAGE__->mk_classdata( ignore_class_regex    => undef );
+__PACKAGE__->mk_classdata( context_classes_regex => undef );
 __PACKAGE__->mk_classdata( logger => '' );
 __PACKAGE__->mk_classdata( st_sql => {} ); # for DBI
 
@@ -83,13 +84,6 @@ use Time::HiRes;
     );
 };
 
-sub base_classes_regex {
-    my $class = shift;
-    return defined $class->_base_classes_regex
-        ? $class->_base_classes_regex
-        : $class->_base_classes_regex(join '|', map { quotemeta } @{$class->base_classes} || '');
-}
-
 sub add_profs {
     my ($class, $module, $methods, $callback) = @_;
     $module->require; # or warn $@ and return;
@@ -107,21 +101,41 @@ sub add_prof {
     my ($class, $module, $method, $callback) = @_;
     $module->require; # or warn $@ and return;
     my $orig  = $module->can($method) or return;
-    my $regex = $class->base_classes_regex;
     my $code  = sub {
         my ($package, $line, $level);
-        if ($regex) {
-            my ($i, $known);
-            for (1..10) {
-                my ($p, $f, $l) = caller($_) or next;
-                $known->{$p}++ and next;
-                $i++;
-                if ($p =~ /^($regex)$/) {
+        my $namespace_regex       = $class->namespace_regex;
+        my $ignore_class_regex    = $class->ignore_class_regex;
+        my $context_classes_regex = $class->context_classes_regex;
+        if ($namespace_regex || $context_classes_regex) {
+            for my $i (1..30) {
+                my ($p, $f, $l) = caller($i) or next;
+                if (
+                    $namespace_regex
+                        &&
+                    !$package
+                        &&
+                    $p =~ /^($namespace_regex)/
+                        &&
+                    (! $ignore_class_regex || $p !~ /$ignore_class_regex/)
+                ) {
+                    ($package, $line) = ($p, $l);
+                }
+
+                if ($context_classes_regex && !$level && $p =~ /^($context_classes_regex)$/) {
                     $level = $i;
+                }
+            }
+        } else {
+            for my $i (1..30) {
+                my ($p, $f, $l) = caller($i) or next;
+                if ($p !~ /^($module)/) {
+                    ($package, $line) = ($p, $l);
                     last;
                 }
-                ($package, $line) = ($p, $l);
             }
+        }
+        unless ($package) {
+            ($package, undef, $line) = caller;
         }
         my $start = [ Time::HiRes::gettimeofday ];
         my ($res, @res);
