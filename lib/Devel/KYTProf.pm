@@ -12,6 +12,7 @@ __PACKAGE__->mk_classdata( st_sql => {} ); # for DBI
 
 use UNIVERSAL::require;
 use Time::HiRes;
+use Term::ANSIColor;
 
 'DBI'->require and do {
     no warnings 'redefine';
@@ -145,18 +146,17 @@ sub add_prof {
             $res = $orig->(@_);
         }
         my $ns = Time::HiRes::tv_interval($start);
-        my $message = sprintf(
-            "%s ms [%s] %s | %s:%d\n",
-            $ns * 1000,
-            ref $_[0] || $_[0] || '',
-            $callback ? $callback->($orig, @_) || '' : $method || '',
-            $package || '',
-            $line || 0,
-        );
+        my $message = "";
+        $message .= colored(sprintf('% 9.3f ms ', $ns * 1000), 'red');
+        $message .= colored(sprintf(' [%s] ', ref $_[0] || $_[0] || ''), 'cyan');
+        $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), 'blue');
+        $message .= ' | ';
+        $message .= colored(sprintf('%s:%d', $package || '', $line || 0), 'green');
+        $message .= "\n";
         $class->logger ? $class->logger->log(
             level   => 'debug',
             message => $message,
-        ) : warn $message;
+        ) : print STDERR $message;
         return wantarray ? @res : $res;
     };
     no strict 'refs';
