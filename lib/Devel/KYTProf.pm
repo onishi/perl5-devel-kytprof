@@ -7,7 +7,8 @@ use base qw/Class::Data::Inheritable/;
 __PACKAGE__->mk_classdata( namespace_regex       => undef );
 __PACKAGE__->mk_classdata( ignore_class_regex    => undef );
 __PACKAGE__->mk_classdata( context_classes_regex => undef );
-__PACKAGE__->mk_classdata( logger => '' );
+__PACKAGE__->mk_classdata( logger => undef );
+__PACKAGE__->mk_classdata( threshold => undef );
 __PACKAGE__->mk_classdata( st_sql => {} ); # for DBI
 
 use UNIVERSAL::require;
@@ -107,6 +108,7 @@ sub add_prof {
         my $namespace_regex       = $class->namespace_regex;
         my $ignore_class_regex    = $class->ignore_class_regex;
         my $context_classes_regex = $class->context_classes_regex;
+        my $threshold             = $class->threshold;
         if ($namespace_regex || $context_classes_regex) {
             for my $i (1..30) {
                 my ($p, $f, $l) = caller($i) or next;
@@ -145,18 +147,20 @@ sub add_prof {
         } else {
             $res = $orig->(@_);
         }
-        my $ns = Time::HiRes::tv_interval($start);
-        my $message = "";
-        $message .= colored(sprintf('% 9.3f ms ', $ns * 1000), 'red');
-        $message .= colored(sprintf(' [%s] ', ref $_[0] || $_[0] || ''), 'cyan');
-        $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), 'blue');
-        $message .= ' | ';
-        $message .= colored(sprintf('%s:%d', $package || '', $line || 0), 'green');
-        $message .= "\n";
-        $class->logger ? $class->logger->log(
-            level   => 'debug',
-            message => $message,
-        ) : print STDERR $message;
+        my $ns = Time::HiRes::tv_interval($start) * 1000;
+        if (!$threshold || $ns > $threshold) {
+            my $message = "";
+            $message .= colored(sprintf('% 9.3f ms ', $ns), 'red');
+            $message .= colored(sprintf(' [%s] ', ref $_[0] || $_[0] || ''), 'cyan');
+            $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), 'blue');
+            $message .= ' | ';
+            $message .= colored(sprintf('%s:%d', $package || '', $line || 0), 'green');
+            $message .= "\n";
+            $class->logger ? $class->logger->log(
+                level   => 'debug',
+                message => $message,
+            ) : print STDERR $message;
+        }
         return wantarray ? @res : $res;
     };
     no strict 'refs';
@@ -201,6 +205,14 @@ You can add profiler to any method.
 
   Devel::KYTProf->add_profs($module, ':all');
   Devel::KYTProf->add_profs($module, ':all', $callback);
+
+You can change settings.
+
+  Devel::KYTProf->namespace_regex();
+  Devel::KYTProf->ignore_class_regex();
+  Devel::KYTProf->context_classes_regex();
+  Devel::KYTProf->logger();
+  Devel::KYTProf->threshold();
 
 =head1 AUTHOR
 
