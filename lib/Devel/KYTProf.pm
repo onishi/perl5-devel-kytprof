@@ -148,7 +148,7 @@ sub add_prof {
             $res = $orig->(@_);
         }
         my $ns = Time::HiRes::tv_interval($start) * 1000;
-        if (!$threshold || $ns > $threshold) {
+        if (!$threshold || $ns >= $threshold) {
             my $message = "";
             $message .= colored(sprintf('% 9.3f ms ', $ns), 'red');
             $message .= colored(sprintf(' [%s] ', ref $_[0] || $_[0] || ''), 'cyan');
