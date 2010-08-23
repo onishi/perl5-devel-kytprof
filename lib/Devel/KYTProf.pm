@@ -4,6 +4,8 @@ use warnings;
 
 use base qw/Class::Data::Inheritable/;
 
+our $VERSION = '0.01';
+
 __PACKAGE__->mk_classdata( namespace_regex       => undef );
 __PACKAGE__->mk_classdata( ignore_class_regex    => undef );
 __PACKAGE__->mk_classdata( context_classes_regex => undef );
@@ -225,6 +227,8 @@ Yasuhiro Onishi E<lt>yasuhiro.onishi@gmail.comE<gt>
 =item L<DBI>
 
 =item L<LWP::UserAgent>
+
+=back
 
 =head1 LICENSE
 
