@@ -161,6 +161,9 @@ sub add_prof {
             $class->logger ? $class->logger->log(
                 level   => 'debug',
                 message => $message,
+                module  => $module,
+                method  => $method,
+                time    => $ns,
             ) : print STDERR $message;
         }
         return wantarray ? @res : $res;
