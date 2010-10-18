@@ -31,6 +31,10 @@ use Term::ANSIColor;
         __PACKAGE__->st_sql->{$sth} = $_[1];
         return $sth;
     };
+    __PACKAGE__->add_profs(
+        'DBI',
+        [qw{connect connect_cached disconnect}],
+    );
     __PACKAGE__->add_prof(
         'DBI::st',
         'execute',
