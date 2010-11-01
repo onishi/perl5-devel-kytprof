@@ -92,6 +92,18 @@ use Term::ANSIColor;
     );
 };
 
+my %color = (
+    'time'   => 'red',
+    'module' => 'cyan',
+    'info'   => 'blue',
+    'call'   => 'green',
+);
+
+sub import {
+    my ($class, %opts) = @_;
+    %color = (%color, %{$opts{color}||{}});
+}
+
 sub add_profs {
     my ($class, $module, $methods, $callback) = @_;
     $module->require; # or warn $@ and return;
@@ -156,11 +168,11 @@ sub add_prof {
         my $ns = Time::HiRes::tv_interval($start) * 1000;
         if (!$threshold || $ns >= $threshold) {
             my $message = "";
-            $message .= colored(sprintf('% 9.3f ms ', $ns), 'red');
-            $message .= colored(sprintf(' [%s] ', ref $_[0] || $_[0] || ''), 'cyan');
-            $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), 'blue');
+            $message .= colored(sprintf('% 9.3f ms ', $ns), $color{'time'});
+            $message .= colored(sprintf(' [%s] ', ref $_[0] || $_[0] || ''), $color{'module'});
+            $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), $color{info});
             $message .= ' | ';
-            $message .= colored(sprintf('%s:%d', $package || '', $line || 0), 'green');
+            $message .= colored(sprintf('%s:%d', $package || '', $line || 0), $color{call});
             $message .= "\n";
             $class->logger ? $class->logger->log(
                 level   => 'debug',
