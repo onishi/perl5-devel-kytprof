@@ -13,6 +13,11 @@ __PACKAGE__->mk_classdata( logger => undef );
 __PACKAGE__->mk_classdata( threshold => undef );
 __PACKAGE__->mk_classdata( st_sql => {} ); # for DBI
 
+__PACKAGE__->mk_classdata( color_time   => 'red' );
+__PACKAGE__->mk_classdata( color_module => 'cyan' );
+__PACKAGE__->mk_classdata( color_info   => 'blue' );
+__PACKAGE__->mk_classdata( color_call   => 'green' );
+
 use UNIVERSAL::require;
 use Time::HiRes;
 use Term::ANSIColor;
@@ -156,11 +161,11 @@ sub add_prof {
         my $ns = Time::HiRes::tv_interval($start) * 1000;
         if (!$threshold || $ns >= $threshold) {
             my $message = "";
-            $message .= colored(sprintf('% 9.3f ms ', $ns), 'red');
-            $message .= colored(sprintf(' [%s] ', ref $_[0] || $_[0] || ''), 'cyan');
-            $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), 'blue');
+            $message .= colored(sprintf('% 9.3f ms ', $ns), $class->color_time);
+            $message .= colored(sprintf(' [%s] ', ref $_[0] || $_[0] || ''), $class->color_module);
+            $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), $class->color_info);
             $message .= ' | ';
-            $message .= colored(sprintf('%s:%d', $package || '', $line || 0), 'green');
+            $message .= colored(sprintf('%s:%d', $package || '', $line || 0), $class->color_call);
             $message .= "\n";
             $class->logger ? $class->logger->log(
                 level   => 'debug',
