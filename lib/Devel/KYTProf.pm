@@ -177,6 +177,8 @@ sub add_prof {
     *{"$module\::$method"} = $code;
 }
 
+*{DB::DB} = sub {};
+
 1;
 
 __END__
