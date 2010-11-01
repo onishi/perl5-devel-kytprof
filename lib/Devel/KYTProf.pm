@@ -38,7 +38,7 @@ use Term::ANSIColor;
     };
     __PACKAGE__->add_profs(
         'DBI',
-        [qw{connect connect_cached disconnect}],
+        [qw{connect}],
     );
     __PACKAGE__->add_prof(
         'DBI::st',
