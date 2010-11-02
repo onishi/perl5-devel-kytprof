@@ -18,6 +18,9 @@ __PACKAGE__->mk_classdata( color_module => 'cyan' );
 __PACKAGE__->mk_classdata( color_info   => 'blue' );
 __PACKAGE__->mk_classdata( color_call   => 'green' );
 
+__PACKAGE__->mk_classdata( _orig_code   => {} );
+__PACKAGE__->mk_classdata( _prof_code   => {} );
+
 use UNIVERSAL::require;
 use Time::HiRes;
 use Term::ANSIColor;
@@ -129,6 +132,8 @@ sub add_prof {
     my ($class, $module, $method, $callback) = @_;
     $module->require; # or warn $@ and return;
     my $orig  = $module->can($method) or return;
+    $class->_orig_code->{$module}->{$method} = $orig;
+
     my $code  = sub {
         my ($package, $line, $level);
         my $namespace_regex       = $class->namespace_regex;
@@ -192,9 +197,44 @@ sub add_prof {
         }
         return wantarray ? @res : $res;
     };
+    $class->_prof_code->{$module}->{$method} = $code;
+
+    $class->_inject_code($module, $method, $code);
+}
+
+sub _inject_code {
+    my ($class, $module, $method, $code) = @_;
     no strict 'refs';
     no warnings qw/redefine prototype/;
     *{"$module\::$method"} = $code;
+}
+
+sub mute {
+    my ($class, $module, @methods) = @_;
+
+    if (scalar(@methods)) {
+        for my $method (@methods) {
+            $class->_inject_code($module, $method, $class->_orig_code->{$module}->{$method});
+        }
+    } else {
+        for my $method (keys %{$class->_orig_code->{$module}}) {
+            $class->_inject_code($module, $method, $class->_orig_code->{$module}->{$method});
+        }
+    }
+}
+
+sub unmute {
+    my ($class, $module, @methods) = @_;
+
+    if (scalar(@methods)) {
+        for my $method (@methods) {
+            $class->_inject_code($module, $method, $class->_prof_code->{$module}->{$method});
+        }
+    } else {
+        for my $method (keys %{$class->_prof_code->{$module}}) {
+            $class->_inject_code($module, $method, $class->_prof_code->{$module}->{$method});
+        }
+    }
 }
 
 *{DB::DB} = sub {};
@@ -244,6 +284,8 @@ You can change settings.
   Devel::KYTProf->context_classes_regex();
   Devel::KYTProf->logger();
   Devel::KYTProf->threshold();
+  Devel::KYTProf->mute($module, $method);
+  Devel::KYTProf->unmute($module, $method);
 
 =head1 AUTHOR
 
@@ -256,6 +298,8 @@ Yasuhiro Onishi E<lt>yasuhiro.onishi@gmail.comE<gt>
 =item L<DBI>
 
 =item L<LWP::UserAgent>
+
+=item L<Cache::Memcached::Fast>
 
 =back
 
