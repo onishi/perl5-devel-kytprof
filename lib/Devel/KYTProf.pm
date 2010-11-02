@@ -38,7 +38,7 @@ use Term::ANSIColor;
     };
     __PACKAGE__->add_profs(
         'DBI',
-        [qw{connect connect_cached disconnect}],
+        [qw{connect}],
     );
     __PACKAGE__->add_prof(
         'DBI::st',
@@ -62,22 +62,37 @@ use Term::ANSIColor;
 };
 
 'Cache::Memcached::Fast'->require and do {
-    __PACKAGE__->add_profs(
+    for my $method (qw/add append set get gets delete prepend replace cas incr decr/) {
+        __PACKAGE__->add_prof(
+            'Cache::Memcached::Fast',
+            $method,
+            sub {
+                my ($orig, $self, $key,) = @_;
+                return sprintf '%s %s', $method, $key;
+            }
+        );
+        my $method_multi = $method.'_multi';
+        __PACKAGE__->add_prof(
+            'Cache::Memcached::Fast',
+            $method_multi,
+            sub {
+                my ($orig, $self, @args) = @_;
+                if (ref $args[0] eq 'ARRAY') {
+                    return sprintf '%s %s', $method_multi, join( ', ', map { $_->[0] } @args);
+                } else {
+                    return sprintf '%s %s', $method_multi, join( ', ', map {ref($_) eq 'ARRAY' ? join(', ',@$_) : $_} @args);
+                }
+            }
+        );
+    }
+
+    __PACKAGE__->add_prof(
         'Cache::Memcached::Fast',
-        [qw{
-            add     add_multi
-            append  append_multi
-            cas     cas_multi
-            decr    decr_multi
-            delete  delete_multi
-            get     get_multi
-            gets    gets_multi
-            incr    incr_multi
-            prepend prepend_multi
-            remove
-            replace replace_multi
-            set     set_multi
-        }],
+        'remove',
+        sub {
+            my ($orig, $self, $key,) = @_;
+            return sprintf 'remove %s', $key;
+        }
     );
 };
 
@@ -181,6 +196,8 @@ sub add_prof {
     no warnings qw/redefine prototype/;
     *{"$module\::$method"} = $code;
 }
+
+*{DB::DB} = sub {};
 
 1;
 
