@@ -47,8 +47,9 @@ use Term::ANSIColor;
         'DBI::st',
         'execute',
         sub {
-            my ($orig, $sth) = @_;
-            return sprintf '%s (%d rows)', __PACKAGE__->st_sql->{$sth}, $sth->rows;
+            my ($orig, $sth, @binds) = @_;
+            my $bind_info = scalar(@binds) ? '(bind: '.join(', ',@binds).')' : '';
+            return sprintf '%s %s (%d rows)', __PACKAGE__->st_sql->{$sth}, $bind_info, $sth->rows;
         }
     );
 };
