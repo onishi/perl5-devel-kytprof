@@ -293,10 +293,11 @@ You can change settings.
   Devel::KYTProf->namespace_regex();
   Devel::KYTProf->ignore_class_regex();
   Devel::KYTProf->context_classes_regex();
-  Devel::KYTProf->logger();
-  Devel::KYTProf->threshold();
+  Devel::KYTProf->logger($logger);
+  Devel::KYTProf->threshold(100); # ms
   Devel::KYTProf->mute($module, $method);
   Devel::KYTProf->unmute($module, $method);
+  Devel::KYTProf->remove_linefeed(1);
 
 =head1 AUTHOR
 
