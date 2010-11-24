@@ -187,6 +187,7 @@ sub add_prof {
             $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), $class->color_info);
             $message .= ' | ';
             $message .= colored(sprintf('%s:%d', $package || '', $line || 0), $class->color_call);
+            $message =~ s/\n/ /g;
             $message .= "\n";
             $class->logger ? $class->logger->log(
                 level   => 'debug',
