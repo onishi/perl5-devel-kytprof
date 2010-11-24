@@ -12,6 +12,7 @@ __PACKAGE__->mk_classdata( context_classes_regex => undef );
 __PACKAGE__->mk_classdata( logger => undef );
 __PACKAGE__->mk_classdata( threshold => undef );
 __PACKAGE__->mk_classdata( st_sql => {} ); # for DBI
+__PACKAGE__->mk_classdata( remove_linefeed => undef );
 
 __PACKAGE__->mk_classdata( color_time   => 'red' );
 __PACKAGE__->mk_classdata( color_module => 'cyan' );
@@ -195,6 +196,7 @@ sub add_prof {
             $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), $class->color_info);
             $message .= ' | ';
             $message .= colored(sprintf('%s:%d', $package || '', $line || 0), $class->color_call);
+            $message =~ s/\n/ /g if $class->remove_linefeed;
             $message .= "\n";
             $class->logger ? $class->logger->log(
                 level   => 'debug',
