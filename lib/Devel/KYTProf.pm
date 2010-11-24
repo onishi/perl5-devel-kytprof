@@ -39,9 +39,17 @@ use Term::ANSIColor;
         __PACKAGE__->st_sql->{$sth} = $_[1];
         return $sth;
     };
-    __PACKAGE__->add_profs(
+    __PACKAGE__->add_prof(
         'DBI',
-        [qw{connect}],
+        'connect',
+        sub {
+            my ($orig, $class, $dsn, $user, $pass, $attr) = @_;
+            return sprintf(
+                '%s %s',
+                $attr->{dbi_connect_method} || 'connect',
+                $dsn,
+            );
+        }
     );
     __PACKAGE__->add_prof(
         'DBI::st',
@@ -71,7 +79,7 @@ use Term::ANSIColor;
             'Cache::Memcached::Fast',
             $method,
             sub {
-                my ($orig, $self, $key,) = @_;
+                my ($orig, $self, $key) = @_;
                 return sprintf '%s %s', $method, $key;
             }
         );
