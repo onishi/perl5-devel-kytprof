@@ -11,7 +11,6 @@ __PACKAGE__->mk_classdata( ignore_class_regex    => undef );
 __PACKAGE__->mk_classdata( context_classes_regex => undef );
 __PACKAGE__->mk_classdata( logger => undef );
 __PACKAGE__->mk_classdata( threshold => undef );
-__PACKAGE__->mk_classdata( st_sql => {} ); # for DBI
 __PACKAGE__->mk_classdata( remove_linefeed => undef );
 
 __PACKAGE__->mk_classdata( color_time   => 'red' );
@@ -28,18 +27,6 @@ use Term::ANSIColor;
 
 'DBI'->require and do {
     no warnings 'redefine';
-    my $orig_prepare        = \&DBI::db::prepare;
-    my $orig_prepare_cached = \&DBI::db::prepare_cached;
-    *DBI::db::prepare = sub {
-        my $sth = $orig_prepare->(@_);
-        __PACKAGE__->st_sql->{$sth} = $_[1];
-        return $sth;
-    };
-    *DBI::db::prepare_cached = sub {
-        my $sth = $orig_prepare_cached->(@_);
-        __PACKAGE__->st_sql->{$sth} = $_[1];
-        return $sth;
-    };
     __PACKAGE__->add_prof(
         'DBI',
         'connect',
@@ -57,8 +44,9 @@ use Term::ANSIColor;
         'execute',
         sub {
             my ($orig, $sth, @binds) = @_;
+            my $sql = $sth->{Database}->{Statement};
             my $bind_info = scalar(@binds) ? '(bind: '.join(', ',@binds).')' : '';
-            return sprintf '%s %s (%d rows)', __PACKAGE__->st_sql->{$sth}, $bind_info, $sth->rows;
+            return sprintf '%s %s (%d rows)', $sql, $bind_info, $sth->rows;
         }
     );
 };
