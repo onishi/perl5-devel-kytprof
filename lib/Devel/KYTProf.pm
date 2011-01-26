@@ -192,6 +192,8 @@ sub add_prof {
                 module  => $module,
                 method  => $method,
                 time    => $ns,
+                package => $package,
+                line    => $line,
             ) : print STDERR $message;
         }
         return wantarray ? @res : $res;
