@@ -238,7 +238,10 @@ sub unmute {
     }
 }
 
-*{DB::DB} = sub {};
+{
+    no warnings 'redefine';
+    *DB::DB = sub {};
+}
 
 1;
 
