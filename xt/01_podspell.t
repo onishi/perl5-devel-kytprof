@@ -8,3 +8,4 @@ __DATA__
 Yasuhiro Onishi
 yasuhiro.onishi@gmail.com
 Devel::KYTProf
+profiler
