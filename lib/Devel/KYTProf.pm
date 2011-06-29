@@ -67,7 +67,10 @@ use Term::ANSIColor;
         __PACKAGE__->add_prof(
             'Cache::Memcached::Fast',
             $method,
-            sub {
+            $method eq 'get' ? sub {
+                my ($orig, $self, $key) = @_;
+                return sprintf '%s %s', $method, $key;
+            } : sub {
                 my ($orig, $self, $key) = @_;
                 return sprintf '%s %s', $method, $key;
             }
