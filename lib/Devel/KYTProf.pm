@@ -45,7 +45,7 @@ use Term::ANSIColor;
         sub {
             my ($orig, $sth, @binds) = @_;
             my $sql = $sth->{Database}->{Statement};
-            my $bind_info = scalar(@binds) ? '(bind: '.join(', ',@binds).')' : '';
+            my $bind_info = scalar(@binds) ? '(bind: '.join(', ', map { defined $_ ? $_ : 'undef' } @binds).')' : '';
             return sprintf '%s %s (%d rows)', $sql, $bind_info, $sth->rows;
         }
     );
