@@ -1,4 +1,3 @@
-MANIFEST
 .gitignore
 Changes
 inc/Module/Install.pm
@@ -15,7 +14,6 @@ inc/Module/Install/WriteAll.pm
 inc/Test/More.pm
 lib/Devel/KYTProf.pm
 Makefile.PL
-META.yml
 README
 t/00_compile.t
 xt/01_podspell.t
