@@ -113,6 +113,17 @@ use Term::ANSIColor;
     );
 };
 
+'Furl::HTTP'->require and do {
+    __PACKAGE__->add_prof(
+        'Furl::HTTP',
+        'request',
+        sub {
+            my($orig, $self, %args) = @_;
+            return sprintf '%s %s', $args{method}, $args{url};
+        },
+    );
+};
+
 sub add_profs {
     my ($class, $module, $methods, $callback) = @_;
     $module->require; # or warn $@ and return;
