@@ -1,4 +1,7 @@
 Revision history for Perl extension Devel::KYTProf
 
+0.02    Tue Jun 5 16:50:10 JST 2012
+        - Added furl support (Songmu)
+
 0.01    Fri Jun 18 21:10:02 2010
         - original version
