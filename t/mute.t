@@ -4,6 +4,8 @@ use Test::More;
 use Devel::KYTProf;
 use Data::Dumper;
 
+local $ENV{ANSI_COLORS_DISABLED} = 1;
+
 Devel::KYTProf->add_profs('Mock',[qw/foo baz/]);
 
 {
@@ -12,7 +14,7 @@ Devel::KYTProf->add_profs('Mock',[qw/foo baz/]);
     *STDERR = $fh;
 
     Mock->foo;
-    like $buffer, qr/\[Mock\]  foo  |/;
+    like $buffer, qr/\[Mock\]  foo  \|/;
 
     close $fh;
 }
@@ -29,11 +31,12 @@ Devel::KYTProf->add_profs('Mock',[qw/foo baz/]);
 
     Mock->baz;
 
-    like $buffer, qr/\[Mock\]  baz  |/;
+    like $buffer, qr/\[Mock\]  baz  \|/;
 
     Devel::KYTProf->unmute('Mock','foo');
 
-    like $buffer, qr/\[Mock\]  foo  |/;
+    Mock->foo;
+    like $buffer, qr/\[Mock\]  foo  \|/;
 
     close $fh;
 }
@@ -53,8 +56,8 @@ Devel::KYTProf->add_profs('Mock',[qw/foo baz/]);
 
     Mock->foo;
     Mock->baz;
-    like $buffer, qr/\[Mock\]  foo  |/;
-    like $buffer, qr/\[Mock\]  baz  |/;
+    like $buffer, qr/\[Mock\]  foo  \|/;
+    like $buffer, qr/\[Mock\]  baz  \|/;
 
     close $fh;
 }
