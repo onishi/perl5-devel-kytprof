@@ -10,6 +10,8 @@ BEGIN {
     plan skip_all => 'needs DBD::SQLite for testing' if $@;
 }
 
+local $ENV{ANSI_COLORS_DISABLED} = 1;
+
 my $buffer = '';
 open my $fh, '>', \$buffer or die "Could not open in-memory buffer";
 *STDERR = $fh;
@@ -28,7 +30,7 @@ close $fh;
     my $sth = $dbi->prepare('insert into mock (id, name) values (?,?)');
     $sth->execute(1,'nekokak');
 
-    like $buffer, qr/\[DBI::st\]  insert into mock \(id, name\) values \(\?,\?\) \(bind: 1, nekokak\) \(1 rows\)  |/;
+    like $buffer, qr/\[DBI::st\]  insert into mock \(id, name\) values \(\?,\?\) \(bind: 1, nekokak\) \(1 rows\)  \|/;
 
     close $fh;
 }
