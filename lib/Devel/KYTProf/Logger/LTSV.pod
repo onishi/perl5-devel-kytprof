@@ -1,0 +1,35 @@
+=head1 NAME
+
+Devel::KYTProf::Logger::LTSV - LTSV logger module for Devel::KYTProf
+
+=head1 SYNOPSIS
+
+  use Devel::KYTProf;
+  use Devel::KYTProf::Logger::LTSV;
+  Devel::KYTProf->logger('Devel::KYTProf::Logger::LTSV');
+  
+  ...
+
+=head1 DESCRIPTION
+
+The C<Devel::KYTProf::Logger::LTSV> module provides LTSV output
+support for the L<Devel::KYTProf> module.
+
+=head1 SEE ALSO
+
+L<Devel::KYTProf>.
+
+<http://ltsv.org/>.
+
+=head1 AUTHOR
+
+Wakaba <wakabatan@hatena.ne.jp>.
+
+=head1 LICENSE
+
+Copyright 2013 Hatena <http://www.hatena.ne.jp/company/>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
