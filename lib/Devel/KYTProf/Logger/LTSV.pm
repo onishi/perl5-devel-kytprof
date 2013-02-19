@@ -12,7 +12,7 @@ sub log {
     my ($class, %args) = @_;
 
     print join "\t", map { $_->[0] . ':' . _escape $_->[1] }
-        [time => $args{time}],
+        [runtime => $args{time}],
         [operation_class => $args{module}],
         [operation_method => $args{method}],
         [caller_package => $args{package}],
