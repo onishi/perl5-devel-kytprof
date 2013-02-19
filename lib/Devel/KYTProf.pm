@@ -32,11 +32,14 @@ use Term::ANSIColor;
         'connect',
         sub {
             my ($orig, $class, $dsn, $user, $pass, $attr) = @_;
-            return sprintf(
+            return [
                 '%s %s',
-                $attr->{dbi_connect_method} || 'connect',
-                $dsn,
-            );
+                ['dbi_connect_method', 'dsn'],
+                {
+                    dbi_connect_method => $attr->{dbi_connect_method} || 'connect',
+                    dsn => $dsn,
+                },
+            ];
         }
     );
     __PACKAGE__->add_prof(
@@ -46,7 +49,15 @@ use Term::ANSIColor;
             my ($orig, $sth, @binds) = @_;
             my $sql = $sth->{Database}->{Statement};
             my $bind_info = scalar(@binds) ? '(bind: '.join(', ', map { defined $_ ? $_ : 'undef' } @binds).')' : '';
-            return sprintf '%s %s (%d rows)', $sql, $bind_info, $sth->rows;
+            return [
+                '%s %s (%d rows)',
+                ['sql', 'sql_binds', 'rows'],
+                {
+                    sql => $sql,
+                    sql_binds => $bind_info,
+                    rows => $sth->rows,
+                },
+            ];
         }
     );
 };
@@ -57,7 +68,14 @@ use Term::ANSIColor;
         'request',
         sub {
             my($orig, $self, $request, $arg, $size, $previous) = @_;
-            return sprintf '%s %s', $request->method, $request->uri;
+            return [
+                '%s %s',
+                ['http_method', 'http_url'],
+                {
+                    http_method => $request->method,
+                    http_url => ''.$request->uri,
+                },
+            ];
         },
     );
 };
@@ -69,7 +87,14 @@ use Term::ANSIColor;
             $method,
             sub {
                 my ($orig, $self, $key) = @_;
-                return sprintf '%s %s', $method, $key;
+                return [
+                    '%s %s',
+                    ['memcached_method', 'memcached_key'],
+                    {
+                        memcached_method => $method,
+                        memcached_key => $key,
+                    },
+                ];
             }
         );
         my $method_multi = $method.'_multi';
@@ -79,9 +104,23 @@ use Term::ANSIColor;
             sub {
                 my ($orig, $self, @args) = @_;
                 if (ref $args[0] eq 'ARRAY') {
-                    return sprintf '%s %s', $method_multi, join( ', ', map { $_->[0] } @args);
+                    return [
+                        '%s %s',
+                        ['memcached_method', 'memcached_key'],
+                        {
+                            memcached_method => $method_multi,
+                            memcached_key => join( ', ', map { $_->[0] } @args),
+                        },
+                    ];
                 } else {
-                    return sprintf '%s %s', $method_multi, join( ', ', map {ref($_) eq 'ARRAY' ? join(', ',@$_) : $_} @args);
+                    return [
+                        '%s %s',
+                        ['memcached_method', 'memcached_key'],
+                        {
+                            memcached_method => $method_multi,
+                            memcached_key => join( ', ', map {ref($_) eq 'ARRAY' ? join(', ',@$_) : $_} @args),
+                        },
+                    ];
                 }
             }
         );
@@ -92,7 +131,14 @@ use Term::ANSIColor;
         'remove',
         sub {
             my ($orig, $self, $key,) = @_;
-            return sprintf 'remove %s', $key;
+            return [
+                '%s %s',
+                ['memcached_method', 'memcached_key'],
+                {
+                    memcached_method => 'remove',
+                    memcached_key => $key,
+                },
+            ];
         }
     );
 };
@@ -119,7 +165,14 @@ use Term::ANSIColor;
         'request',
         sub {
             my($orig, $self, %args) = @_;
-            return sprintf '%s %s', $args{method}, $args{url};
+            return [
+                '%s %s',
+                ['http_method', 'http_url'],
+                {
+                    http_method => $args{method},
+                    http_url => $args{url},
+                },
+            ];
         },
     );
 };
@@ -192,7 +245,17 @@ sub add_prof {
             my $message = "";
             $message .= colored(sprintf('% 9.3f ms ', $ns), $class->color_time);
             $message .= colored(sprintf(' [%s] ', ref $_[0] || $_[0] || ''), $class->color_module);
-            $message .= colored(sprintf(' %s ', $callback ? $callback->($orig, @_) || '' : $method || ''), $class->color_info);
+            my $cb_info;
+            my $cb_data;
+            if ($callback) {
+                my $v = $callback->($orig, @_);
+                $cb_info = sprintf $v->[0], map { $v->[2]->{$_} } @{$v->[1]};
+                $cb_data = $v->[2];
+            } else {
+                $cb_info = $method;
+                $cb_data = {};
+            }
+            $message .= colored(sprintf(' %s ', $cb_info), $class->color_info);
             $message .= ' | ';
             $message .= colored(sprintf('%s:%d', $package || '', $line || 0), $class->color_call);
             $message =~ s/\n/ /g if $class->remove_linefeed;
@@ -206,6 +269,7 @@ sub add_prof {
                 package => $package,
                 file    => $file,
                 line    => $line,
+                data    => $cb_data,
             ) : print STDERR $message;
         }
         return wantarray ? @res : $res;
