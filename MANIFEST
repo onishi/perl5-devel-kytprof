@@ -13,9 +13,13 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Test/More.pm
 lib/Devel/KYTProf.pm
+lib/Devel/KYTProf/Logger/LTSV.pm
+lib/Devel/KYTProf/Logger/LTSV.pod
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+MYMETA.json
+MYMETA.yml
 README
 README.pod
 t/00_compile.t
