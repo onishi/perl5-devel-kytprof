@@ -144,7 +144,7 @@ sub add_prof {
     $class->_orig_code->{$module}->{$method} = $orig;
 
     my $code  = sub {
-        my ($package, $line, $level);
+        my ($package, $file, $line, $level);
         my $namespace_regex       = $class->namespace_regex;
         my $ignore_class_regex    = $class->ignore_class_regex;
         my $context_classes_regex = $class->context_classes_regex;
@@ -161,7 +161,7 @@ sub add_prof {
                         &&
                     (! $ignore_class_regex || $p !~ /$ignore_class_regex/)
                 ) {
-                    ($package, $line) = ($p, $l);
+                    ($package, $file, $line) = ($p, $f, $l);
                 }
 
                 if ($context_classes_regex && !$level && $p =~ /^($context_classes_regex)$/) {
@@ -172,13 +172,13 @@ sub add_prof {
             for my $i (1..30) {
                 my ($p, $f, $l) = caller($i) or next;
                 if ($p !~ /^($module)/) {
-                    ($package, $line) = ($p, $l);
+                    ($package, $file, $line) = ($p, $f, $l);
                     last;
                 }
             }
         }
         unless ($package) {
-            ($package, undef, $line) = caller;
+            ($package, $file, $line) = caller;
         }
         my $start = [ Time::HiRes::gettimeofday ];
         my ($res, @res);
@@ -204,6 +204,7 @@ sub add_prof {
                 method  => $method,
                 time    => $ns,
                 package => $package,
+                file    => $file,
                 line    => $line,
             ) : print STDERR $message;
         }
