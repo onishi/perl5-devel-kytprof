@@ -1,7 +1,10 @@
 Revision history for Perl extension Devel::KYTProf
 
+0.04    Tue Feb 19 19:07:11 JST 2013
+        - Changed label "time" to "runtime" (Wakaba)
+
 0.03    Tue Feb 19 17:50:20 JST 2013
-        - Added LTSV logger (wakaba)
+        - Added LTSV logger (Wakaba)
 
 0.02    Tue Jun 5 16:50:10 JST 2012
         - Added furl support (Songmu)
