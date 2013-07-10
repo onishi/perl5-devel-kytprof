@@ -1,5 +1,7 @@
 Revision history for Perl extension Devel::KYTProf
 
+{{$NEXT}}
+
 0.05    Wed Jul 10 19:13:07 JST 2013
         - Added compatibility code for 'add_prof' version <= 0.02 (fujiwara)
 
