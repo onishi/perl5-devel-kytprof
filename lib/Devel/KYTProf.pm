@@ -250,8 +250,13 @@ sub add_prof {
             my $cb_data;
             if ($callback) {
                 my $v = $callback->($orig, @_);
-                $cb_info = sprintf $v->[0], map { $v->[2]->{$_} } @{$v->[1]};
-                $cb_data = $v->[2];
+                if (ref $v eq "ARRAY") {
+                    $cb_info = sprintf $v->[0], map { $v->[2]->{$_} } @{$v->[1]};
+                    $cb_data = $v->[2];
+                } else {
+                    $cb_info = $v;
+                    $cb_data = {};
+                }
             } else {
                 $cb_info = $method;
                 $cb_data = {};
