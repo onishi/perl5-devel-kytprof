@@ -2,3 +2,10 @@ META.yml
 MANIFEST
 inc/
 Makefile
+/Devel-KYTProf-*
+/.build
+/_build_params
+/Build
+!Build/
+!META.json
+!LICENSE
