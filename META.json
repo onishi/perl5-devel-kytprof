@@ -1,0 +1,82 @@
+{
+   "abstract" : "Simple profiler",
+   "author" : [
+      "Yasuhiro Onishi <yasuhiro.onishi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.6, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-KYTProf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Data::Inheritable" : "0",
+            "Term::ANSIColor" : "0",
+            "Time::HiRes" : "0",
+            "UNIVERSAL::require" : "0"
+         }
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/onishi/perl5-devel-kytprof/issues"
+      },
+      "homepage" : "https://github.com/onishi/perl5-devel-kytprof",
+      "repository" : {
+         "url" : "https://github.com/onishi/perl5-devel-kytprof.git",
+         "web" : "https://github.com/onishi/perl5-devel-kytprof"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Atsushi Kobayashi <nekokak@gmail.com>",
+      "Kentaro Kuribayashi <kentarok@gmail.com>",
+      "motemen <motemen@gmail.com>",
+      "cho45 <cho45@lowreal.net>",
+      "Masayuki Matsuki <y.songmu@gmail.com>",
+      "soh335 <sugarbabe335@gmail.com>",
+      "Wakaba <wakabatan@hatena.ne.jp>",
+      "hitode909 <hitode909@gmail.com>",
+      "FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>",
+      "Yasuhiro Onishi <onishi@hatena.ne.jp>",
+      "shiba_yu36 <shibayu36@gmail.com>"
+   ]
+}
