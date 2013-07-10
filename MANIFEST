@@ -21,9 +21,11 @@ META.yml
 README
 README.pod
 t/00_compile.t
+t/add_prof_compat.t
 t/dbi.t
 t/memcached.t
 t/mute.t
+t/remove_escape_sequences.t
 xt/01_podspell.t
 xt/02_perlcritic.t
 xt/03_pod.t
