@@ -4,7 +4,7 @@ use warnings;
 
 use base qw/Class::Data::Inheritable/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 __PACKAGE__->mk_classdata( namespace_regex       => undef );
 __PACKAGE__->mk_classdata( ignore_class_regex    => undef );

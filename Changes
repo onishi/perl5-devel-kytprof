@@ -1,5 +1,8 @@
 Revision history for Perl extension Devel::KYTProf
 
+0.05    Wed Jul 10 19:13:07 JST 2013
+        - Added compatibility code for 'add_prof' version <= 0.02 (fujiwara)
+
 0.04    Tue Feb 19 19:07:11 JST 2013
         - Changed label "time" to "runtime" (Wakaba)
 
