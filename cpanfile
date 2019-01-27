@@ -1,7 +1,7 @@
 requires 'Class::Data::Inheritable';
+requires 'Module::Load';
 requires 'Term::ANSIColor';
 requires 'Time::HiRes';
-requires 'UNIVERSAL::require';
 
 on build => sub {
     requires 'ExtUtils::MakeMaker', '6.36';

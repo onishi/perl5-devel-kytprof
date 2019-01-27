@@ -22,12 +22,12 @@ __PACKAGE__->mk_classdata( color_call   => 'green' );
 __PACKAGE__->mk_classdata( _orig_code   => {} );
 __PACKAGE__->mk_classdata( _prof_code   => {} );
 
-use UNIVERSAL::require;
+use Module::Load ();
 use Time::HiRes;
 use Term::ANSIColor;
 
-'DBI'->require and do {
-    no warnings 'redefine';
+eval { Module::Load::load('DBI') };
+if (!$@) {
     __PACKAGE__->add_prof(
         'DBI',
         'connect',
@@ -63,7 +63,8 @@ use Term::ANSIColor;
     );
 };
 
-'LWP::UserAgent'->require and do {
+eval { Module::Load::load('LWP::UserAgent') };
+if (!$@) {
     __PACKAGE__->add_prof(
         'LWP::UserAgent',
         'request',
@@ -81,7 +82,8 @@ use Term::ANSIColor;
     );
 };
 
-'Cache::Memcached::Fast'->require and do {
+eval { Module::Load::load('Cache::Memcached::Fast') };
+if (!$@) {
     for my $method (qw/add append set get gets delete prepend replace cas incr decr/) {
         __PACKAGE__->add_prof(
             'Cache::Memcached::Fast',
@@ -144,7 +146,8 @@ use Term::ANSIColor;
     );
 };
 
-'MogileFS::Client'->require and do {
+eval { Module::Load::load('MogileFS::Client') };
+if (!$@) {
     __PACKAGE__->add_profs(
         'MogileFS::Client',
         [qw{
@@ -160,7 +163,8 @@ use Term::ANSIColor;
     );
 };
 
-'Furl::HTTP'->require and do {
+eval { Module::Load::load('Furl::HTTP') };
+if (!$@) {
     __PACKAGE__->add_prof(
         'Furl::HTTP',
         'request',
@@ -180,9 +184,10 @@ use Term::ANSIColor;
 
 sub add_profs {
     my ($class, $module, $methods, $callback) = @_;
-    $module->require; # or warn $@ and return;
+    eval {Module::Load::load($module)};
     if ($methods eq ':all') {
-        Class::Inspector->require or return;
+        eval { Module::Load::load('Class/Inspector.pm') };
+        return if $@;
         $methods = [];
         @$methods = @{Class::Inspector->methods($module, 'public')};
     }
@@ -193,7 +198,7 @@ sub add_profs {
 
 sub add_prof {
     my ($class, $module, $method, $callback) = @_;
-    $module->require; # or warn $@ and return;
+    eval {Module::Load::load($module)};
     my $orig  = $module->can($method) or return;
     $class->_orig_code->{$module}->{$method} = $orig;
 
