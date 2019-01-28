@@ -26,161 +26,26 @@ use Module::Load ();
 use Time::HiRes;
 use Term::ANSIColor;
 
-eval { Module::Load::load('DBI') };
-if (!$@) {
-    __PACKAGE__->add_prof(
-        'DBI',
-        'connect',
-        sub {
-            my ($orig, $class, $dsn, $user, $pass, $attr) = @_;
-            return [
-                '%s %s',
-                ['dbi_connect_method', 'dsn'],
-                {
-                    dbi_connect_method => $attr->{dbi_connect_method} || 'connect',
-                    dsn => $dsn,
-                },
-            ];
-        }
-    );
-    __PACKAGE__->add_prof(
-        'DBI::st',
-        'execute',
-        sub {
-            my ($orig, $sth, @binds) = @_;
-            my $sql = $sth->{Database}->{Statement};
-            my $bind_info = scalar(@binds) ? '(bind: '.join(', ', map { defined $_ ? $_ : 'undef' } @binds).')' : '';
-            return [
-                '%s %s (%d rows)',
-                ['sql', 'sql_binds', 'rows'],
-                {
-                    sql => $sql,
-                    sql_binds => $bind_info,
-                    rows => $sth->rows,
-                },
-            ];
-        }
-    );
-};
+__PACKAGE__->apply_prof('DBI');
+__PACKAGE__->apply_prof('LWP::UserAgent');
+__PACKAGE__->apply_prof('Cache::Memcached::Fast');
+__PACKAGE__->apply_prof('MogileFS::Client');
+__PACKAGE__->apply_prof('Furl::HTTP');
 
-eval { Module::Load::load('LWP::UserAgent') };
-if (!$@) {
-    __PACKAGE__->add_prof(
-        'LWP::UserAgent',
-        'request',
-        sub {
-            my($orig, $self, $request, $arg, $size, $previous) = @_;
-            return [
-                '%s %s',
-                ['http_method', 'http_url'],
-                {
-                    http_method => $request->method,
-                    http_url => ''.$request->uri,
-                },
-            ];
-        },
-    );
-};
+sub apply_prof {
+    my ($class, $pkg, $profiler_pkg) = @_;
+    eval { Module::Load::load($pkg) };
+    return if $@;
 
-eval { Module::Load::load('Cache::Memcached::Fast') };
-if (!$@) {
-    for my $method (qw/add append set get gets delete prepend replace cas incr decr/) {
-        __PACKAGE__->add_prof(
-            'Cache::Memcached::Fast',
-            $method,
-            sub {
-                my ($orig, $self, $key) = @_;
-                return [
-                    '%s %s',
-                    ['memcached_method', 'memcached_key'],
-                    {
-                        memcached_method => $method,
-                        memcached_key => $key,
-                    },
-                ];
-            }
-        );
-        my $method_multi = $method.'_multi';
-        __PACKAGE__->add_prof(
-            'Cache::Memcached::Fast',
-            $method_multi,
-            sub {
-                my ($orig, $self, @args) = @_;
-                if (ref $args[0] eq 'ARRAY') {
-                    return [
-                        '%s %s',
-                        ['memcached_method', 'memcached_key'],
-                        {
-                            memcached_method => $method_multi,
-                            memcached_key => join( ', ', map { $_->[0] } @args),
-                        },
-                    ];
-                } else {
-                    return [
-                        '%s %s',
-                        ['memcached_method', 'memcached_key'],
-                        {
-                            memcached_method => $method_multi,
-                            memcached_key => join( ', ', map {ref($_) eq 'ARRAY' ? join(', ',@$_) : $_} @args),
-                        },
-                    ];
-                }
-            }
-        );
+    $profiler_pkg ||= $pkg;
+    my $prefix = 'Devel::KYTProf::Profiler';
+    unless ($profiler_pkg =~ s/^\+// || $profiler_pkg =~ /^$prefix/) {
+        $profiler_pkg = "$prefix\::$profiler_pkg";
     }
-
-    __PACKAGE__->add_prof(
-        'Cache::Memcached::Fast',
-        'remove',
-        sub {
-            my ($orig, $self, $key,) = @_;
-            return [
-                '%s %s',
-                ['memcached_method', 'memcached_key'],
-                {
-                    memcached_method => 'remove',
-                    memcached_key => $key,
-                },
-            ];
-        }
-    );
-};
-
-eval { Module::Load::load('MogileFS::Client') };
-if (!$@) {
-    __PACKAGE__->add_profs(
-        'MogileFS::Client',
-        [qw{
-            edit_file
-            read_file
-            store_file
-            store_content
-            get_paths
-            get_file_data
-            delete
-            rename
-        }],
-    );
-};
-
-eval { Module::Load::load('Furl::HTTP') };
-if (!$@) {
-    __PACKAGE__->add_prof(
-        'Furl::HTTP',
-        'request',
-        sub {
-            my($orig, $self, %args) = @_;
-            return [
-                '%s %s',
-                ['http_method', 'http_url'],
-                {
-                    http_method => $args{method},
-                    http_url => $args{url},
-                },
-            ];
-        },
-    );
-};
+    eval {Module::Load::load($profiler_pkg)};
+    my $c = $profiler_pkg->can('apply');
+    $c && $c->();
+}
 
 sub add_profs {
     my ($class, $module, $methods, $callback) = @_;
@@ -368,6 +233,11 @@ You can add profiler to any method.
 
   Devel::KYTProf->add_profs($module, ':all');
   Devel::KYTProf->add_profs($module, ':all', $callback);
+
+You can specify profiler packages.
+
+  # Devel::KYTProf::Profiler::DBI is loaded and called C<apply> method
+  Devel::KYTProf->apply_prof('DBI');
 
 You can change settings.
 
