@@ -2,25 +2,27 @@ package Devel::KYTProf;
 use strict;
 use warnings;
 
-use base qw/Class::Data::Inheritable/;
-
 our $VERSION = '0.05';
 
-__PACKAGE__->mk_classdata( namespace_regex       => undef );
-__PACKAGE__->mk_classdata( ignore_class_regex    => undef );
-__PACKAGE__->mk_classdata( context_classes_regex => undef );
-__PACKAGE__->mk_classdata( logger => undef );
-__PACKAGE__->mk_classdata( threshold => undef );
-__PACKAGE__->mk_classdata( remove_linefeed => undef );
-__PACKAGE__->mk_classdata( remove_escape_sequences => undef );
+use Class::Data::Lite (
+    rw => {
+        namespace_regex         => undef,
+        ignore_class_regex      => undef,
+        context_classes_regex   => undef,
+        logger                  => undef,
+        threshold               => undef,
+        remove_linefeed         => undef,
+        remove_escape_sequences => undef,
 
-__PACKAGE__->mk_classdata( color_time   => 'red' );
-__PACKAGE__->mk_classdata( color_module => 'cyan' );
-__PACKAGE__->mk_classdata( color_info   => 'blue' );
-__PACKAGE__->mk_classdata( color_call   => 'green' );
+        color_time   => 'red',
+        color_module => 'cyan',
+        color_info   => 'blue',
+        color_call   => 'green',
 
-__PACKAGE__->mk_classdata( _orig_code   => {} );
-__PACKAGE__->mk_classdata( _prof_code   => {} );
+        _orig_code => {},
+        _prof_code => {},
+    },
+);
 
 use Module::Load ();
 use Time::HiRes;
