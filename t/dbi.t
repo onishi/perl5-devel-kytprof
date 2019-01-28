@@ -35,5 +35,20 @@ close $fh;
     close $fh;
 }
 
+{
+    my $buffer = '';
+    open my $fh, '>', \$buffer or die "Could not open in-memory buffer";
+    *STDERR = $fh;
+
+    my $sth = $dbi->prepare('insert into mock (id, name) values (?,?)');
+    $sth->bind_param(1, 2);
+    $sth->bind_param(2, 'onishi');
+    $sth->execute;
+
+    like $buffer, qr/\[DBI::st\]  insert into mock \(id, name\) values \(\?,\?\) \(bind: 2, onishi\) \(1 rows\)  \|/;
+
+    close $fh;
+}
+
 done_testing;
 

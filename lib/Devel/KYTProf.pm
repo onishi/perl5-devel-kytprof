@@ -53,7 +53,7 @@ sub apply_prof {
 }
 
 sub add_profs {
-    my ($class, $module, $methods, $callback) = @_;
+    my ($class, $module, $methods, $callback, $sampler) = @_;
     eval {Module::Load::load($module)};
     if ($methods eq ':all') {
         eval { Module::Load::load('Class/Inspector.pm') };
@@ -62,7 +62,7 @@ sub add_profs {
         @$methods = @{Class::Inspector->methods($module, 'public')};
     }
     for my $method (@$methods) {
-        $class->add_prof($module, $method, $callback);
+        $class->add_prof($module, $method, $callback, $sampler);
     }
 }
 
