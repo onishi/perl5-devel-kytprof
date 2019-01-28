@@ -3,10 +3,7 @@ use warnings;
 use Test::More;
 use Devel::KYTProf;
 
-BEGIN {
-    eval "use Cache::Memcached::Fast";
-    plan skip_all => "Cache::Memcached::Fast is not installed. skip testing" if $@;
-}
+use Test::Requires 'Cache::Memcached::Fast';
 
 local $ENV{ANSI_COLORS_DISABLED} = 1;
 

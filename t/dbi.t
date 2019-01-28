@@ -3,12 +3,7 @@ use warnings;
 use Test::More;
 use Devel::KYTProf;
 
-BEGIN {
-    eval "use DBI";
-    plan skip_all => 'DBI is not installed. skip testing' if $@;
-    eval "use DBD::SQLite";
-    plan skip_all => 'needs DBD::SQLite for testing' if $@;
-}
+use Test::Requires 'DBI', 'DBD::SQLite';
 
 local $ENV{ANSI_COLORS_DISABLED} = 1;
 
