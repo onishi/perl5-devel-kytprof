@@ -67,12 +67,19 @@ sub add_profs {
 }
 
 sub add_prof {
-    my ($class, $module, $method, $callback) = @_;
+    my ($class, $module, $method, $callback, $sampler) = @_;
     eval {Module::Load::load($module)};
     my $orig  = $module->can($method) or return;
     $class->_orig_code->{$module}->{$method} = $orig;
 
     my $code  = sub {
+        if ($sampler) {
+            my $is_sample = $sampler->($orig, @_);
+            unless ($is_sample) {
+                return $orig->(@_);
+            }
+        }
+
         my ($package, $file, $line, $level);
         my $namespace_regex       = $class->namespace_regex;
         my $ignore_class_regex    = $class->ignore_class_regex;
