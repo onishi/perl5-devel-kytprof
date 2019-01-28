@@ -48,8 +48,7 @@ sub apply_prof {
         $profiler_pkg = "$prefix\::$profiler_pkg";
     }
     eval {Module::Load::load($profiler_pkg)};
-    my $c = $profiler_pkg->can('apply');
-    $c && $c->();
+    ($profiler_pkg->can('apply') || sub {})->();
 }
 
 sub add_profs {
