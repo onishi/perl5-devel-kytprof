@@ -26,11 +26,14 @@ use Module::Load ();
 use Time::HiRes;
 use Term::ANSIColor;
 
-__PACKAGE__->apply_prof('DBI');
-__PACKAGE__->apply_prof('LWP::UserAgent');
-__PACKAGE__->apply_prof('Cache::Memcached::Fast');
-__PACKAGE__->apply_prof('MogileFS::Client');
-__PACKAGE__->apply_prof('Furl::HTTP');
+sub import {
+    __PACKAGE__->apply_prof('DBI');
+    __PACKAGE__->apply_prof('LWP::UserAgent');
+    __PACKAGE__->apply_prof('Cache::Memcached::Fast');
+    __PACKAGE__->apply_prof('MogileFS::Client');
+    __PACKAGE__->apply_prof('Furl::HTTP');
+    1;
+}
 
 sub apply_prof {
     my ($class, $pkg, $profiler_pkg) = @_;
