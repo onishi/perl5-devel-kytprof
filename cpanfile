@@ -1,4 +1,6 @@
 requires 'Class::Data::Lite';
+requires 'Class::Inspector';
+requires 'DBIx::Tracer';
 requires 'Module::Load';
 requires 'Term::ANSIColor';
 requires 'Time::HiRes';

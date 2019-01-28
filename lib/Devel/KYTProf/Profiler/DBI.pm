@@ -2,8 +2,18 @@ package Devel::KYTProf::Profiler::DBI;
 
 use strict;
 use warnings;
+use DBIx::Tracer;
 
 sub apply {
+    my $_last_sql;
+    my $_last_binds;
+
+    our $_tracer = DBIx::Tracer->new(sub {
+        my %args = @_;
+        $_last_sql = $args{sql};
+        $_last_binds = scalar(@{ $args{bind_parans} }) ? '(bind: '.join(', ', map { defined $_ ? $_ : 'undef' } @{ $args{bind_parans} }).')' : '';
+    });
+
     Devel::KYTProf->add_prof(
         'DBI',
         'connect',
@@ -23,16 +33,14 @@ sub apply {
         'DBI::st',
         'execute',
         sub {
-            my ($orig, $sth, @binds) = @_;
-            my $sql = $sth->{Database}->{Statement};
-            my $bind_info = scalar(@binds) ? '(bind: '.join(', ', map { defined $_ ? $_ : 'undef' } @binds).')' : '';
+            my (undef, $sth) = @_;
             return [
                 '%s %s (%d rows)',
                 ['sql', 'sql_binds', 'rows'],
                 {
-                    sql => $sql,
-                    sql_binds => $bind_info,
-                    rows => $sth->rows,
+                    sql       => $_last_sql,
+                    sql_binds => $_last_binds,
+                    rows      => $sth->rows,
                 },
             ];
         }
