@@ -38,17 +38,24 @@ sub import {
 }
 
 sub apply_prof {
-    my ($class, $pkg, $profiler_pkg) = @_;
+    my ($class, $pkg, $prof_pkg) = @_;
     eval { Module::Load::load($pkg) };
     return if $@;
 
-    $profiler_pkg ||= $pkg;
+    $prof_pkg ||= $pkg;
     my $prefix = 'Devel::KYTProf::Profiler';
-    unless ($profiler_pkg =~ s/^\+// || $profiler_pkg =~ /^$prefix/) {
-        $profiler_pkg = "$prefix\::$profiler_pkg";
+    unless ($prof_pkg =~ s/^\+// || $prof_pkg =~ /^$prefix/) {
+        $prof_pkg = "$prefix\::$prof_pkg";
     }
-    eval {Module::Load::load($profiler_pkg)};
-    ($profiler_pkg->can('apply') || sub {})->();
+    eval {Module::Load::load($prof_pkg)};
+    if ($@) {
+        die qq{failed to load profiler package "$prof_pkg" for "$pkg": $@\n};
+    }
+    my $c = $prof_pkg->can('apply');
+    unless ($c) {
+        die qq{The "$prof_pkg" has no `apply` method};
+    }
+    $c->();
 }
 
 sub add_profs {
@@ -236,19 +243,13 @@ Output as follows.
 
 You can add profiler to any method.
 
-  Devel::KYTProf->add_prof($module, $method);
-  Devel::KYTProf->add_prof($module, $method, $callback);
-
-  Devel::KYTProf->add_profs($module, $methods);
-  Devel::KYTProf->add_profs($module, $methods, $callback);
-
-  Devel::KYTProf->add_profs($module, ':all');
-  Devel::KYTProf->add_profs($module, ':all', $callback);
+  Devel::KYTProf->add_prof($module, $method, [$callback, $sampler]);
+  Devel::KYTProf->add_profs($module, $methods, [$callback, $sampler]);
+  Devel::KYTProf->add_profs($module, ':all', [$callback, $sampler]);
 
 You can specify profiler packages.
 
-  # Devel::KYTProf::Profiler::DBI is loaded and called C<apply> method
-  Devel::KYTProf->apply_prof('DBI');
+  Devel::KYTProf->apply_prof($pkg, [$prof_pkg]);
 
 You can change settings.
 

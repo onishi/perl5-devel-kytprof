@@ -26,31 +26,39 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "6.36"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035"
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
          }
       },
       "develop" : {
          "requires" : {
+            "Cache::Memcached::Fast" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7"
+            "Test::Spellunker" : "v0.2.7",
+            "Test::mysqld" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Class::Data::Inheritable" : "0",
+            "Class::Data::Lite" : "0",
+            "Class::Inspector" : "0",
+            "DBIx::Tracer" : "0",
             "Module::Load" : "0",
-            "Term::ANSIColor" : "0",
-            "Time::HiRes" : "0"
+            "Term::ANSIColor" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
          }
       }
    },
