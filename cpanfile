@@ -19,4 +19,5 @@ on develop => sub {
     requires 'DBD::SQLite';
     requires 'DBI';
     requires 'Test::Perl::Critic';
+    requires 'Test::mysqld';
 };
