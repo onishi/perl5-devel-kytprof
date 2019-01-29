@@ -32,6 +32,11 @@ You can add profiler to any method.
     Devel::KYTProf->add_profs($module, ':all');
     Devel::KYTProf->add_profs($module, ':all', $callback);
 
+You can specify profiler packages.
+
+    # Devel::KYTProf::Profiler::DBI is loaded and called C<apply> method
+    Devel::KYTProf->apply_prof('DBI');
+
 You can change settings.
 
     Devel::KYTProf->namespace_regex();
@@ -50,9 +55,9 @@ Yasuhiro Onishi <yasuhiro.onishi@gmail.com>
 
 # SEE ALSO
 
-- [DBI](http://search.cpan.org/perldoc?DBI)
-- [LWP::UserAgent](http://search.cpan.org/perldoc?LWP::UserAgent)
-- [Cache::Memcached::Fast](http://search.cpan.org/perldoc?Cache::Memcached::Fast)
+- [DBI](https://metacpan.org/pod/DBI)
+- [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent)
+- [Cache::Memcached::Fast](https://metacpan.org/pod/Cache::Memcached::Fast)
 
 # LICENSE
 
