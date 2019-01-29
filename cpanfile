@@ -1,4 +1,4 @@
-requires 'Class::Data::Inheritable';
+requires 'Class::Data::Lite';
 requires 'Module::Load';
 requires 'Term::ANSIColor';
 requires 'Time::HiRes';
