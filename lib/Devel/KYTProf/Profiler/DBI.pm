@@ -65,6 +65,10 @@ sub apply {
                 },
             ];
         },
+        # Since there is a possibility that these methods call `execute` method
+        # internally (it depends on DBD implementation), we flag here to prevent
+        # duplicate profiling output.
+        # And we drop this flag in the above callback.
         sub { $IsInProf = 1 },
     );
 }
