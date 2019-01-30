@@ -38,22 +38,23 @@ sub import {
 }
 
 sub apply_prof {
-    my ($class, $pkg, $profiler_pkg) = @_;
+    my ($class, $pkg, $prof_pkg, @args) = @_;
     eval { Module::Load::load($pkg) };
     return if $@;
 
-    $profiler_pkg ||= $pkg;
-    my $prefix = 'Devel::KYTProf::Profiler';
-    unless ($profiler_pkg =~ s/^\+// || $profiler_pkg =~ /^$prefix/) {
-        $profiler_pkg = "$prefix\::$profiler_pkg";
+    $prof_pkg ||= "Devel::KYTProf::Profiler::$pkg";
+    eval {Module::Load::load($prof_pkg)};
+    if ($@) {
+        die qq{failed to load profiler package "$prof_pkg" for "$pkg": $@\n};
     }
-    eval {Module::Load::load($profiler_pkg)};
-    my $c = $profiler_pkg->can('apply');
-    $c && $c->();
+    unless ($prof_pkg->can('apply')) {
+        die qq{"$prof_pkg" has no `apply` method. A profiler package should implement it.\n};
+    }
+    $prof_pkg->apply(@args);
 }
 
 sub add_profs {
-    my ($class, $module, $methods, $callback) = @_;
+    my ($class, $module, $methods, $callback, $sampler) = @_;
     eval {Module::Load::load($module)};
     if ($methods eq ':all') {
         eval { Module::Load::load('Class/Inspector.pm') };
@@ -62,17 +63,27 @@ sub add_profs {
         @$methods = @{Class::Inspector->methods($module, 'public')};
     }
     for my $method (@$methods) {
-        $class->add_prof($module, $method, $callback);
+        $class->add_prof($module, $method, $callback, $sampler);
     }
 }
 
 sub add_prof {
-    my ($class, $module, $method, $callback) = @_;
+    my ($class, $module, $method, $callback, $sampler) = @_;
     eval {Module::Load::load($module)};
-    my $orig  = $module->can($method) or return;
-    $class->_orig_code->{$module}->{$method} = $orig;
+    my $orig = $class->_orig_code->{$module}{$method};
+    unless ($orig) {
+        $orig = $module->can($method) or return;
+        $class->_orig_code->{$module}->{$method} = $orig;
+    }
 
-    my $code  = sub {
+    my $code = sub {
+        if ($sampler) {
+            my $is_sample = $sampler->($orig, @_);
+            unless ($is_sample) {
+                return $orig->(@_);
+            }
+        }
+
         my ($package, $file, $line, $level);
         my $namespace_regex       = $class->namespace_regex;
         my $ignore_class_regex    = $class->ignore_class_regex;
@@ -230,19 +241,15 @@ Output as follows.
 
 You can add profiler to any method.
 
-  Devel::KYTProf->add_prof($module, $method);
-  Devel::KYTProf->add_prof($module, $method, $callback);
+  Devel::KYTProf->add_prof($module, $method, [$callback, $sampler]);
+  Devel::KYTProf->add_profs($module, $methods, [$callback, $sampler]);
+  Devel::KYTProf->add_profs($module, ':all', [$callback, $sampler]);
 
-  Devel::KYTProf->add_profs($module, $methods);
-  Devel::KYTProf->add_profs($module, $methods, $callback);
-
-  Devel::KYTProf->add_profs($module, ':all');
-  Devel::KYTProf->add_profs($module, ':all', $callback);
+The C<< $sampler >> is still an experimental feature.
 
 You can specify profiler packages.
 
-  # Devel::KYTProf::Profiler::DBI is loaded and called C<apply> method
-  Devel::KYTProf->apply_prof('DBI');
+  Devel::KYTProf->apply_prof($pkg, [$prof_pkg, @args]);
 
 You can change settings.
 
