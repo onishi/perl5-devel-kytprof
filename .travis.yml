@@ -1,0 +1,6 @@
+language: perl
+perl:
+  - "5.8"
+  - "5.28"
+install: cpanm -nq --with-develop --installdeps .
+script: prove -lvr --norc
