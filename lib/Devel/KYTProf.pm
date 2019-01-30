@@ -47,11 +47,10 @@ sub apply_prof {
     if ($@) {
         die qq{failed to load profiler package "$prof_pkg" for "$pkg": $@\n};
     }
-    my $c = $prof_pkg->can('apply');
-    unless ($c) {
-        die qq{"$prof_pkg" has no `apply` method. A profiler package should implement it.};
+    unless ($prof_pkg->can('apply')) {
+        die qq{"$prof_pkg" has no `apply` method. A profiler package should implement it.\n};
     }
-    $c->(@args);
+    $prof_pkg->apply(@args);
 }
 
 sub add_profs {
