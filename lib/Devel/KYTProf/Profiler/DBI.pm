@@ -21,15 +21,17 @@ sub apply {
         }
     );
 
-    my $_last_sql;
-    my $_last_binds;
-    my $_in_prof;
+    my $LastSQL;
+    my $LastBinds;
+    my $IsInProf;
 
-    our $_tracer = DBIx::Tracer->new(sub {
+    our $_TRACER = DBIx::Tracer->new(sub {
         my %args = @_;
-        $_last_sql = $args{sql};
+        $LastSQL = $args{sql};
         my $bind_params = $args{bind_params} || [];
-        $_last_binds = scalar(@$bind_params) ? '(bind: '.join(', ', map { defined $_ ? $_ : 'undef' } @$bind_params).')' : '';
+        $LastBinds = scalar(@$bind_params) ?
+            '(bind: '.join(', ', map { defined $_ ? $_ : 'undef' } @$bind_params).')' :
+            '';
     });
     Devel::KYTProf->add_prof(
         'DBI::st',
@@ -40,30 +42,30 @@ sub apply {
                 '%s %s (%d rows)',
                 ['sql', 'sql_binds', 'rows'],
                 {
-                    sql       => $_last_sql,
-                    sql_binds => $_last_binds,
+                    sql       => $LastSQL,
+                    sql_binds => $LastBinds,
                     rows      => $sth->rows,
                 },
             ];
         },
-        sub { !$_in_prof },
+        sub { !$IsInProf },
     );
 
     Devel::KYTProf->add_profs(
         'DBI::db',
         [qw/do selectall_arrayref selectrow_arrayref selectrow_array/],
         sub {
-            undef $_in_prof;
+            undef $IsInProf;
             return [
                 '%s %s',
                 ['sql', 'sql_binds'],
                 {
-                    sql       => $_last_sql,
-                    sql_binds => $_last_binds,
+                    sql       => $LastSQL,
+                    sql_binds => $LastBinds,
                 },
             ];
         },
-        sub { $_in_prof = 1 },
+        sub { $IsInProf = 1 },
     );
 }
 
