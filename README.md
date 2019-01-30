@@ -27,9 +27,11 @@ You can add profiler to any method.
     Devel::KYTProf->add_profs($module, $methods, [$callback, $sampler]);
     Devel::KYTProf->add_profs($module, ':all', [$callback, $sampler]);
 
+The `$sampler` is still an experimental feature.
+
 You can specify profiler packages.
 
-    Devel::KYTProf->apply_prof($pkg, [$prof_pkg]);
+    Devel::KYTProf->apply_prof($pkg, [$prof_pkg, @args]);
 
 You can change settings.
 
