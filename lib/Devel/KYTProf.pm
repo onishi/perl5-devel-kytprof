@@ -71,8 +71,11 @@ sub add_profs {
 sub add_prof {
     my ($class, $module, $method, $callback, $sampler) = @_;
     eval {Module::Load::load($module)};
-    my $orig  = $module->can($method) or return;
-    $class->_orig_code->{$module}->{$method} = $orig;
+    my $orig = $class->_orig_code->{$module}{$method};
+    unless ($orig) {
+        $orig = $module->can($method) or return;
+        $class->_orig_code->{$module}->{$method} = $orig;
+    }
 
     my $code = sub {
         if ($sampler) {
