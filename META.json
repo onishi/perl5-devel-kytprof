@@ -74,13 +74,13 @@
          "web" : "https://github.com/onishi/perl5-devel-kytprof"
       }
    },
-   "version" : "0.05",
+   "version" : "0.9991",
    "x_authority" : "cpan:ONISHI",
    "x_contributors" : [
       "Atsushi Kobayashi <nekokak@gmail.com>",
       "FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>",
       "Kentaro Kuribayashi <kentarok@gmail.com>",
-      "Songmu <y.songmu@gmail.com>",
+      "Masayuki Matsuki <y.songmu@gmail.com>",
       "Wakaba <wakabatan@hatena.ne.jp>",
       "Yasuhiro Onishi <onishi@hatena.ne.jp>",
       "cho45 <cho45@lowreal.net>",

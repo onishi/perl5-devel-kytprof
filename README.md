@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/onishi/perl5-devel-kytprof.svg?branch=master)](https://travis-ci.org/onishi/perl5-devel-kytprof)
+[![Build Status](https://travis-ci.org/onishi/perl5-devel-kytprof.svg?branch=master)](https://travis-ci.org/onishi/perl5-devel-kytprof) [![Coverage Status](https://img.shields.io/coveralls/onishi/perl5-devel-kytprof/master.svg?style=flat)](https://coveralls.io/r/onishi/perl5-devel-kytprof?branch=master)
 # NAME
 
 Devel::KYTProf - Simple profiler

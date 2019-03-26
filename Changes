@@ -2,6 +2,12 @@ Revision history for Perl extension Devel::KYTProf
 
 {{$NEXT}}
 
+0.9991 2019-03-26T04:09:02Z
+        - add sampler feature and use it for more accurate profiling for DBI
+        - introduce Class::Data::Lite and drop Class::Data::Inheritance
+        - add `apply_prof` method and call them in `import` method
+        - switch from UNIVERSAL::require to Module::Load
+
 0.05    Wed Jul 10 19:13:07 JST 2013
         - Added compatibility code for 'add_prof' version <= 0.02 (fujiwara)
 

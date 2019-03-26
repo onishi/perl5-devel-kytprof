@@ -5,4 +5,7 @@ perl:
 before_install:
 - sudo apt-get update -qq
 - bash author/travis_install_mysql.sh
+- cpanm -n Devel::Cover::Report::Coveralls
 install: cpanm -nq --with-develop --installdeps .
+script:
+  perl Build.PL && ./Build build && cover -test -report coveralls
