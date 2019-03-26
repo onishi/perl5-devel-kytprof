@@ -6,4 +6,3 @@ before_install:
 - sudo apt-get update -qq
 - bash author/travis_install_mysql.sh
 install: cpanm -nq --with-develop --installdeps .
-script: prove -lvr --norc
