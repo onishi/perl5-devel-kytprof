@@ -1,6 +1,8 @@
 Revision history for Perl extension Devel::KYTProf
 
 {{$NEXT}}
+
+0.9992 2019-05-09T05:23:35Z
         - Fix for multiple use (fujiwara)
 
 0.9991 2019-03-26T04:09:02Z
