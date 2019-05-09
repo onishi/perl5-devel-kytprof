@@ -1,6 +1,7 @@
 Revision history for Perl extension Devel::KYTProf
 
 {{$NEXT}}
+        - Fix for multiple use (fujiwara)
 
 0.9991 2019-03-26T04:09:02Z
         - add sampler feature and use it for more accurate profiling for DBI
