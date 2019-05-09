@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Devel::KYTProf;
+use Devel::KYTProf; # test for multiple applied problem
 
 use Test::Requires 'DBI', 'DBD::SQLite';
 
