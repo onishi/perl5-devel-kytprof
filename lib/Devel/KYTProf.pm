@@ -4,6 +4,8 @@ use warnings;
 
 our $VERSION = '0.9991';
 
+my $Applied = {};
+
 use Class::Data::Lite (
     rw => {
         namespace_regex         => undef,
@@ -50,6 +52,7 @@ sub apply_prof {
     unless ($prof_pkg->can('apply')) {
         die qq{"$prof_pkg" has no `apply` method. A profiler package should implement it.\n};
     }
+    return if ++$Applied->{$prof_pkg} > 1; # skip if already applied
     $prof_pkg->apply(@args);
 }
 
