@@ -140,6 +140,7 @@ sub add_prof {
             if ($callback) {
                 my $v = $callback->($orig, @_);
                 if (ref $v eq "ARRAY") {
+                    no warnings;
                     $cb_info = sprintf $v->[0], map { $v->[2]->{$_} } @{$v->[1]};
                     $cb_data = $v->[2];
                 } else {
