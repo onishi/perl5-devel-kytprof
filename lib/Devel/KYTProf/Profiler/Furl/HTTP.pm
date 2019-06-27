@@ -13,7 +13,7 @@ sub build_url {
     my $host = $args{host} || '';
     my $path_query = $args{path_query} || '';
 
-    return sprintf('%s://%s%s%s', $scheme, $host, $port, substr($args{path_query}, 0, 1) eq '/' ? $path_query : "/$path_query");
+    return sprintf('%s://%s%s%s', $scheme, $host, $port ? ":$port" : '', substr($path_query, 0, 1) eq '/' ? $path_query : "/$path_query");
 }
 
 sub apply {
