@@ -2,6 +2,9 @@ Revision history for Perl extension Devel::KYTProf
 
 {{$NEXT}}
 
+0.9993 2019-06-28T05:45:15Z
+        - suppress uninitialized warning in Devel::KYTProf::Profiler::Furl::HTTP (papix)
+
 0.9992 2019-05-09T05:23:35Z
         - Fix for multiple use (fujiwara)
 
