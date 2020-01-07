@@ -23,10 +23,13 @@ sub apply {
 
     my $LastSQL;
     my $LastBinds;
+    my $LastDBName;
     my $IsInProf;
 
     our $_TRACER = DBIx::Tracer->new(sub {
         my %args = @_;
+        $LastDBName = $args{dbh}->{Name};
+        $LastDBName = '' unless defined $LastDBName;
         $LastSQL = $args{sql};
         my $bind_params = $args{bind_params} || [];
         $LastBinds = scalar(@$bind_params) ?
@@ -39,12 +42,13 @@ sub apply {
         sub {
             my (undef, $sth) = @_;
             return [
-                '%s %s (%d rows)',
-                ['sql', 'sql_binds', 'rows'],
+                '(db:%s) %s %s (%d rows)',
+                ['database', 'sql', 'sql_binds', 'rows'],
                 {
                     sql       => $LastSQL,
                     sql_binds => $LastBinds,
                     rows      => $sth->rows,
+                    database  => $LastDBName,
                 },
             ];
         },
@@ -57,11 +61,12 @@ sub apply {
         sub {
             undef $IsInProf;
             return [
-                '%s %s',
-                ['sql', 'sql_binds'],
+                '(db:%s) %s %s',
+                ['database', 'sql', 'sql_binds'],
                 {
                     sql       => $LastSQL,
                     sql_binds => $LastBinds,
+                    database  => $LastDBName,
                 },
             ];
         },
