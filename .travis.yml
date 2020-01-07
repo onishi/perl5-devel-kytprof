@@ -8,4 +8,5 @@ before_install:
 - cpanm -n Devel::Cover::Report::Coveralls
 install: cpanm -nq --with-develop --installdeps .
 script:
-  perl Build.PL && ./Build build && cover -test -report coveralls
+- prove -lvr xt/
+- perl Build.PL && ./Build build && cover -test -report coveralls
