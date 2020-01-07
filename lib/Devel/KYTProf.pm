@@ -2,7 +2,7 @@ package Devel::KYTProf;
 use strict;
 use warnings;
 
-our $VERSION = '0.9993';
+our $VERSION = '0.9994';
 
 my $Applied = {};
 

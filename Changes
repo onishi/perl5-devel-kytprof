@@ -2,6 +2,9 @@ Revision history for Perl extension Devel::KYTProf
 
 {{$NEXT}}
 
+0.9994 2020-01-07T06:01:33Z
+        - add db name to DBI trace (aereal)
+
 0.9993 2019-06-28T05:45:15Z
         - suppress uninitialized warning in Devel::KYTProf::Profiler::Furl::HTTP (papix)
 
